@@ -31,10 +31,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Scaffold(
-      backgroundColor: colorScheme.background,
+      backgroundColor: const Color(0xFFE5E7D8),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(48),
         child: _ChatAppBar(
@@ -46,9 +44,12 @@ class _ChatScreenState extends State<ChatScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
-            child: _ChatBody(
-              scrollController: scrollController,
-              messages: _currentMessages,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 30),
+              child: _ChatBody(
+                scrollController: scrollController,
+                messages: _currentMessages,
+              ),
             ),
           ),
           _ChatTextField(onSendPressed: _onSendPressed),
@@ -66,7 +67,8 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void scrollToEnd() {
-    scrollController.jumpTo(scrollController.position.maxScrollExtent + 100000);
+    scrollController
+        .jumpTo(scrollController.position.maxScrollExtent + 1000000);
   }
 
   Future<void> _onSendPressed(String messageText) async {
@@ -87,10 +89,11 @@ class _ChatBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
+    return ListView.separated(
       controller: scrollController,
       physics: const BouncingScrollPhysics(),
       itemCount: messages.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 20),
       itemBuilder: (_, index) => _ChatMessage(
         chatData: messages.elementAt(index),
       ),
@@ -177,35 +180,47 @@ class _ChatMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Material(
-      color: chatData.chatUserDto is ChatUserLocalDto
-          ? colorScheme.primary.withOpacity(.1)
-          : null,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 18,
-          vertical: 18,
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _ChatAvatar(userData: chatData.chatUserDto),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    chatData.chatUserDto.name ?? '',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(chatData.message ?? ''),
-                ],
+    final isMe = chatData.chatUserDto is ChatUserLocalDto;
+
+    final children = [
+      _ChatAvatar(userData: chatData.chatUserDto),
+      const SizedBox(width: 5),
+      Flexible(
+        fit: FlexFit.tight,
+        child: Container(
+          decoration: BoxDecoration(
+              color: isMe
+                  ? colorScheme.primary.withOpacity(.6)
+                  : const Color(0xFFEFF0E8),
+              border: Border.all(
+                color: isMe ? colorScheme.primary : Colors.black,
+                width: 1.4,
               ),
-            ),
-          ],
+              borderRadius: BorderRadius.circular(10)),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                chatData.chatUserDto.name ?? '',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              Text(chatData.message ?? ''),
+            ],
+          ),
         ),
+      )
+    ];
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxHeight: 200, minHeight: 40.0),
+      child: Row(
+        mainAxisAlignment:
+            isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: isMe ? children.reversed.toList() : children,
       ),
     );
   }
@@ -216,10 +231,7 @@ class _ChatAvatar extends StatelessWidget {
 
   final ChatUserDto userData;
 
-  const _ChatAvatar({
-    required this.userData,
-    Key? key,
-  }) : super(key: key);
+  const _ChatAvatar({required this.userData, Key? key}) : super(key: key);
 
   String iconText() {
     var result = '';

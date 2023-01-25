@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData().copyWith(
-        scaffoldBackgroundColor: const Color(0xFFfcfdf6),
+        scaffoldBackgroundColor: const Color(0xFFEFF0E8),
         colorScheme: ThemeData().colorScheme.copyWith(
               primary: const Color(0xFF006e17),
             ),
