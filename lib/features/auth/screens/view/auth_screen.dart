@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:surf_practice_chat_flutter/features/auth/models/token_dto.dart';
+import 'package:surf_practice_chat_flutter/features/chat/repository/chat_repository.dart';
+import 'package:surf_practice_chat_flutter/features/chat/screens/view/chat_screen.dart';
+import 'package:surf_study_jam/surf_study_jam.dart';
+
 import 'package:surf_practice_chat_flutter/features/auth/repository/auth_repository.dart';
 import 'package:surf_practice_chat_flutter/features/auth/screens/bloc/auth_screen_bloc.dart';
-import 'package:surf_practice_chat_flutter/features/chat/repository/chat_repository.dart';
-import 'package:surf_practice_chat_flutter/features/chat/screens/chat_screen.dart';
-import 'package:surf_practice_chat_flutter/token.dart';
-import 'package:surf_study_jam/surf_study_jam.dart';
 
 /// Screen for authorization process.
 ///
@@ -68,8 +67,15 @@ class AuthScreen extends StatelessWidget {
   }
 
   void _pushToChat(BuildContext context, StudyJamClient client) async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? savedToken = prefs.getString('token');
     Navigator.push(context, MaterialPageRoute(builder: (_) {
-      return Scaffold(appBar: AppBar());
+      return ChatScreen(
+        chatRepository: ChatRepository(
+          StudyJamClient().getAuthorizedClient(savedToken!),
+        ),
+      );
+      // Scaffold(appBar: AppBar());
       // TopicsPage(client: client);
     }));
   }
@@ -125,6 +131,7 @@ class AuthView extends StatelessWidget {
             ),
             TextFormField(
               initialValue: initPassword,
+              obscureText: true,
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.lock),
                 labelText: 'Пароль',

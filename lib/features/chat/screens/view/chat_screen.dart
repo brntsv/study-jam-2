@@ -156,10 +156,7 @@ class _ChatAppBar extends StatelessWidget {
 class _ChatMessage extends StatelessWidget {
   final ChatMessageDto chatData;
 
-  const _ChatMessage({
-    required this.chatData,
-    Key? key,
-  }) : super(key: key);
+  const _ChatMessage({required this.chatData, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -208,6 +205,19 @@ class _ChatAvatar extends StatelessWidget {
     Key? key,
   }) : super(key: key);
 
+  String iconText() {
+    var result = '';
+    if (userData.name != null && userData.name!.isNotEmpty) {
+      result = userData.name!.split(' ').first[0];
+      try {
+        result += userData.name!.split(' ').last[0];
+      } catch (e) {
+        print(e);
+      }
+    }
+    return result;
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -220,9 +230,7 @@ class _ChatAvatar extends StatelessWidget {
         shape: const CircleBorder(),
         child: Center(
           child: Text(
-            userData.name != null
-                ? '${userData.name!.split(' ').first[0]}${userData.name!.split(' ').last[0]}'
-                : '',
+            iconText(),
             style: TextStyle(
               color: colorScheme.onPrimary,
               fontWeight: FontWeight.bold,
