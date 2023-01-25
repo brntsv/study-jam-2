@@ -17,9 +17,17 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  ScrollController scrollController = ScrollController();
+
   final _nameEditingController = TextEditingController();
 
   Iterable<ChatMessageDto> _currentMessages = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _onUpdatePressed();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +47,7 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           Expanded(
             child: _ChatBody(
+              scrollController: scrollController,
               messages: _currentMessages,
             ),
           ),
@@ -53,6 +62,11 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() {
       _currentMessages = messages;
     });
+    scrollToEnd();
+  }
+
+  void scrollToEnd() {
+    scrollController.jumpTo(scrollController.position.maxScrollExtent + 100000);
   }
 
   Future<void> _onSendPressed(String messageText) async {
@@ -65,15 +79,17 @@ class _ChatScreenState extends State<ChatScreen> {
 
 class _ChatBody extends StatelessWidget {
   final Iterable<ChatMessageDto> messages;
+  final ScrollController scrollController;
 
-  const _ChatBody({
-    required this.messages,
-    Key? key,
-  }) : super(key: key);
+  const _ChatBody(
+      {required this.messages, Key? key, required this.scrollController})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      controller: scrollController,
+      physics: const BouncingScrollPhysics(),
       itemCount: messages.length,
       itemBuilder: (_, index) => _ChatMessage(
         chatData: messages.elementAt(index),
