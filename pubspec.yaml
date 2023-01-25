@@ -22,5 +22,17 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 flutter:
-
   uses-material-design: true
+
+  # assets:
+  
+  fonts:
+    - family: zelek
+      fonts:
+        - asset: assets/fonts/zelek.ttf
+    - family: play
+      fonts:
+        - asset: assets/fonts/play.ttf
+    - family: blender
+      fonts:
+        - asset: assets/fonts/BlenderPro.ttf

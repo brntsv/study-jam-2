@@ -3,6 +3,7 @@ import 'package:surf_practice_chat_flutter/features/chat/models/chat_message_dto
 import 'package:surf_practice_chat_flutter/features/chat/models/chat_user_dto.dart';
 import 'package:surf_practice_chat_flutter/features/chat/models/chat_user_local_dto.dart';
 import 'package:surf_practice_chat_flutter/features/chat/repository/chat_repository.dart';
+import 'package:surf_practice_chat_flutter/theme/theme.dart';
 
 /// Main screen of chat app, containing messages.
 class ChatScreen extends StatefulWidget {
@@ -32,7 +33,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE5E7D8),
+      backgroundColor: AppColors.backgroundColor,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(48),
         child: _ChatAppBar(
@@ -117,7 +118,6 @@ class _ChatTextField extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Material(
-      color: colorScheme.surface,
       elevation: 12,
       child: Padding(
         padding: EdgeInsets.only(
@@ -137,7 +137,7 @@ class _ChatTextField extends StatelessWidget {
             IconButton(
               onPressed: () => onSendPressed(_textEditingController.text),
               icon: const Icon(Icons.send),
-              color: colorScheme.onSurface,
+              color: colorScheme.primary,
             ),
           ],
         ),
@@ -191,7 +191,7 @@ class _ChatMessage extends StatelessWidget {
           decoration: BoxDecoration(
               color: isMe
                   ? colorScheme.primary.withOpacity(.6)
-                  : const Color(0xFFEFF0E8),
+                  : AppColors.messageCard,
               border: Border.all(
                 color: isMe ? colorScheme.primary : Colors.black,
                 width: 1.4,
@@ -207,7 +207,9 @@ class _ChatMessage extends StatelessWidget {
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
-              Text(chatData.message ?? ''),
+              Text(
+                chatData.message ?? '',
+              ),
             ],
           ),
         ),
@@ -215,7 +217,7 @@ class _ChatMessage extends StatelessWidget {
     ];
 
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxHeight: 200, minHeight: 40.0),
+      constraints: const BoxConstraints(maxHeight: 350, minHeight: 40.0),
       child: Row(
         mainAxisAlignment:
             isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -227,8 +229,6 @@ class _ChatMessage extends StatelessWidget {
 }
 
 class _ChatAvatar extends StatelessWidget {
-  static const double _size = 42;
-
   final ChatUserDto userData;
 
   const _ChatAvatar({required this.userData, Key? key}) : super(key: key);
@@ -249,21 +249,23 @@ class _ChatAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isMe = userData is ChatUserLocalDto;
 
-    return SizedBox(
-      width: _size,
-      height: _size,
-      child: Material(
-        color: colorScheme.primary,
-        shape: const CircleBorder(),
-        child: Center(
-          child: Text(
-            iconText(),
-            style: TextStyle(
-              color: colorScheme.onPrimary,
-              fontWeight: FontWeight.bold,
-              fontSize: 24,
-            ),
+    return Container(
+      decoration: BoxDecoration(
+          border: Border.all(
+            color: isMe ? Colors.transparent : AppColors.avatarBorder,
+            width: 1.5,
+          ),
+          borderRadius: const BorderRadius.all(Radius.circular(50.0))),
+      child: CircleAvatar(
+        backgroundColor: isMe ? colorScheme.primary : AppColors.avatarColor,
+        child: Text(
+          iconText(),
+          style: TextStyle(
+            color: isMe ? colorScheme.onPrimary : AppColors.textAvatarColor,
+            fontWeight: FontWeight.bold,
+            fontSize: 23,
           ),
         ),
       ),
