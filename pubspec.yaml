@@ -15,12 +15,24 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^8.1.1
   shared_preferences: ^2.0.17
-  surf_study_jam: ^0.1.0
+  surf_study_jam: ^0.2.0+1
 
 dev_dependencies:
   flutter_lints: ^2.0.1
   flutter_test:
     sdk: flutter
 flutter:
-
   uses-material-design: true
+
+  # assets:
+  
+  fonts:
+    - family: zelek
+      fonts:
+        - asset: assets/fonts/zelek.ttf
+    - family: play
+      fonts:
+        - asset: assets/fonts/play.ttf
+    - family: blender
+      fonts:
+        - asset: assets/fonts/BlenderPro.ttf

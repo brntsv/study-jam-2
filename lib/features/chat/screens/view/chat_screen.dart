@@ -3,6 +3,7 @@ import 'package:surf_practice_chat_flutter/features/chat/models/chat_message_dto
 import 'package:surf_practice_chat_flutter/features/chat/models/chat_user_dto.dart';
 import 'package:surf_practice_chat_flutter/features/chat/models/chat_user_local_dto.dart';
 import 'package:surf_practice_chat_flutter/features/chat/repository/chat_repository.dart';
+import 'package:surf_practice_chat_flutter/theme/theme.dart';
 
 /// Main screen of chat app, containing messages.
 class ChatScreen extends StatefulWidget {
@@ -17,16 +18,22 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  ScrollController scrollController = ScrollController();
+
   final _nameEditingController = TextEditingController();
 
   Iterable<ChatMessageDto> _currentMessages = [];
 
   @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+  void initState() {
+    super.initState();
+    _onUpdatePressed();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: colorScheme.background,
+      backgroundColor: AppColors.backgroundColor,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(48),
         child: _ChatAppBar(
@@ -38,8 +45,12 @@ class _ChatScreenState extends State<ChatScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
-            child: _ChatBody(
-              messages: _currentMessages,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 30),
+              child: _ChatBody(
+                scrollController: scrollController,
+                messages: _currentMessages,
+              ),
             ),
           ),
           _ChatTextField(onSendPressed: _onSendPressed),
@@ -53,6 +64,12 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() {
       _currentMessages = messages;
     });
+    scrollToEnd();
+  }
+
+  void scrollToEnd() {
+    scrollController
+        .jumpTo(scrollController.position.maxScrollExtent + 1000000);
   }
 
   Future<void> _onSendPressed(String messageText) async {
@@ -65,16 +82,19 @@ class _ChatScreenState extends State<ChatScreen> {
 
 class _ChatBody extends StatelessWidget {
   final Iterable<ChatMessageDto> messages;
+  final ScrollController scrollController;
 
-  const _ChatBody({
-    required this.messages,
-    Key? key,
-  }) : super(key: key);
+  const _ChatBody(
+      {required this.messages, Key? key, required this.scrollController})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
+    return ListView.separated(
+      controller: scrollController,
+      physics: const BouncingScrollPhysics(),
       itemCount: messages.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 20),
       itemBuilder: (_, index) => _ChatMessage(
         chatData: messages.elementAt(index),
       ),
@@ -98,7 +118,6 @@ class _ChatTextField extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Material(
-      color: colorScheme.surface,
       elevation: 12,
       child: Padding(
         padding: EdgeInsets.only(
@@ -118,7 +137,7 @@ class _ChatTextField extends StatelessWidget {
             IconButton(
               onPressed: () => onSendPressed(_textEditingController.text),
               icon: const Icon(Icons.send),
-              color: colorScheme.onSurface,
+              color: colorScheme.primary,
             ),
           ],
         ),
@@ -156,78 +175,97 @@ class _ChatAppBar extends StatelessWidget {
 class _ChatMessage extends StatelessWidget {
   final ChatMessageDto chatData;
 
-  const _ChatMessage({
-    required this.chatData,
-    Key? key,
-  }) : super(key: key);
+  const _ChatMessage({required this.chatData, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Material(
-      color: chatData.chatUserDto is ChatUserLocalDto
-          ? colorScheme.primary.withOpacity(.1)
-          : null,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 18,
-          vertical: 18,
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _ChatAvatar(userData: chatData.chatUserDto),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    chatData.chatUserDto.name ?? '',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(chatData.message ?? ''),
-                ],
+    final isMe = chatData.chatUserDto is ChatUserLocalDto;
+
+    final children = [
+      _ChatAvatar(userData: chatData.chatUserDto),
+      const SizedBox(width: 5),
+      Flexible(
+        fit: FlexFit.tight,
+        child: Container(
+          decoration: BoxDecoration(
+              color: isMe
+                  ? colorScheme.primary.withOpacity(.6)
+                  : AppColors.messageCard,
+              border: Border.all(
+                color: isMe ? colorScheme.primary : Colors.black,
+                width: 1.4,
               ),
-            ),
-          ],
+              borderRadius: BorderRadius.circular(10)),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                chatData.chatUserDto.name ?? '',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                chatData.message ?? '',
+              ),
+            ],
+          ),
         ),
+      )
+    ];
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxHeight: 350, minHeight: 40.0),
+      child: Row(
+        mainAxisAlignment:
+            isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: isMe ? children.reversed.toList() : children,
       ),
     );
   }
 }
 
 class _ChatAvatar extends StatelessWidget {
-  static const double _size = 42;
-
   final ChatUserDto userData;
 
-  const _ChatAvatar({
-    required this.userData,
-    Key? key,
-  }) : super(key: key);
+  const _ChatAvatar({required this.userData, Key? key}) : super(key: key);
+
+  String iconText() {
+    var result = '';
+    if (userData.name != null && userData.name!.isNotEmpty) {
+      result = userData.name!.split(' ').first[0];
+      try {
+        result += userData.name!.split(' ').last[0];
+      } catch (e) {
+        print(e);
+      }
+    }
+    return result;
+  }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isMe = userData is ChatUserLocalDto;
 
-    return SizedBox(
-      width: _size,
-      height: _size,
-      child: Material(
-        color: colorScheme.primary,
-        shape: const CircleBorder(),
-        child: Center(
-          child: Text(
-            userData.name != null
-                ? '${userData.name!.split(' ').first[0]}${userData.name!.split(' ').last[0]}'
-                : '',
-            style: TextStyle(
-              color: colorScheme.onPrimary,
-              fontWeight: FontWeight.bold,
-              fontSize: 24,
-            ),
+    return Container(
+      decoration: BoxDecoration(
+          border: Border.all(
+            color: isMe ? Colors.transparent : AppColors.avatarBorder,
+            width: 1.5,
+          ),
+          borderRadius: const BorderRadius.all(Radius.circular(50.0))),
+      child: CircleAvatar(
+        backgroundColor: isMe ? colorScheme.primary : AppColors.avatarColor,
+        child: Text(
+          iconText(),
+          style: TextStyle(
+            color: isMe ? colorScheme.onPrimary : AppColors.textAvatarColor,
+            fontWeight: FontWeight.bold,
+            fontSize: 23,
           ),
         ),
       ),
