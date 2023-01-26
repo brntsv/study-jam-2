@@ -1,9 +1,10 @@
+import 'package:equatable/equatable.dart';
 import 'package:surf_practice_chat_flutter/features/chat/models/chat_user_dto.dart';
 import 'package:surf_practice_chat_flutter/features/chat/models/chat_user_local_dto.dart';
 import 'package:surf_study_jam/surf_study_jam.dart';
 
 /// Data transfer object representing simple chat message.
-class ChatMessageDto {
+class ChatMessageDto extends Equatable {
   /// Author of message.
   final ChatUserDto chatUserDto;
 
@@ -34,4 +35,7 @@ class ChatMessageDto {
   @override
   String toString() =>
       'ChatMessageDto(chatUserDto: $chatUserDto, message: $message, createdDate: $createdDateTime)';
+
+  @override
+  List<Object?> get props => [chatUserDto, message, createdDateTime];
 }
