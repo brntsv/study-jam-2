@@ -1,97 +1,116 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-import 'package:surf_practice_chat_flutter/features/chat/models/chat_message_dto.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:maps_launcher/maps_launcher.dart';
+import 'package:surf_practice_chat_flutter/features/chat/models/cha_multi_message_dto.dart';
+import 'package:surf_study_jam/surf_study_jam.dart';
+import 'package:intl/intl.dart';
+
 import 'package:surf_practice_chat_flutter/features/chat/models/chat_user_dto.dart';
 import 'package:surf_practice_chat_flutter/features/chat/models/chat_user_local_dto.dart';
-import 'package:surf_practice_chat_flutter/features/chat/repository/chat_repository.dart';
+import 'package:surf_practice_chat_flutter/features/chat/screens/bloc/chat_screen_bloc.dart';
 import 'package:surf_practice_chat_flutter/theme/theme.dart';
 
 /// Main screen of chat app, containing messages.
-class ChatScreen extends StatefulWidget {
+class ChatScreen extends StatelessWidget {
   /// Repository for chat functionality.
-  final IChatRepository chatRepository;
+  final StudyJamClient client;
+  final int chatId;
+  final String? chatTitle;
 
   /// Constructor for [ChatScreen].
-  const ChatScreen({required this.chatRepository, Key? key}) : super(key: key);
+  const ChatScreen({
+    Key? key,
+    required this.client,
+    required this.chatId,
+    this.chatTitle,
+  }) : super(key: key);
 
-  @override
-  State<ChatScreen> createState() => _ChatScreenState();
-}
-
-class _ChatScreenState extends State<ChatScreen> {
-  ScrollController scrollController = ScrollController();
-
-  final _nameEditingController = TextEditingController();
-
-  Iterable<ChatMessageDto> _currentMessages = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _onUpdatePressed();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _onUpdatePressed();
+  // }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(48),
-        child: _ChatAppBar(
-          controller: _nameEditingController,
-          onUpdatePressed: _onUpdatePressed,
-        ),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 30),
-              child: _ChatBody(
-                scrollController: scrollController,
-                messages: _currentMessages,
-              ),
-            ),
-          ),
-          _ChatTextField(onSendPressed: _onSendPressed),
-        ],
-      ),
+    return BlocProvider(
+      create: (context) =>
+          ChatScreenBloc(client: client, chatId: chatId, chatTitle: chatTitle)
+            ..add(ChatScreenUpdate()),
+      child: const ChatView(),
     );
   }
 
-  Future<void> _onUpdatePressed() async {
-    final messages = await widget.chatRepository.getMessages();
-    setState(() {
-      _currentMessages = messages;
-    });
-    scrollToEnd();
-  }
+  // Future<void> _onUpdatePressed() async {
+  //   final messages = await widget.chatRepository.getMessages();
+  //   setState(() {
+  //     _currentMessages = messages;
+  //   });
+  //   scrollToEnd();
+  // }
 
-  void scrollToEnd() {
-    scrollController
-        .jumpTo(scrollController.position.maxScrollExtent + 1000000);
-  }
+  // void scrollToEnd() {
+  //   scrollController
+  //       .jumpTo(scrollController.position.maxScrollExtent + 1000000);
+  // }
 
-  Future<void> _onSendPressed(String messageText) async {
-    final messages = await widget.chatRepository.sendMessage(messageText);
-    setState(() {
-      _currentMessages = messages;
-    });
+  // Future<void> _onSendPressed(String messageText) async {
+  //   final messages = await widget.chatRepository.sendMessage(messageText);
+  //   setState(() {
+  //     _currentMessages = messages;
+  //   });
+  // }
+}
+
+class ChatView extends StatelessWidget {
+  const ChatView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var bloc = context.read<ChatScreenBloc>();
+
+    return BlocBuilder<ChatScreenBloc, ChatScreenState>(
+      builder: (context, state) {
+        return Scaffold(
+          backgroundColor: AppColors.backgroundColor,
+          appBar: PreferredSize(
+            preferredSize: const Size.fromHeight(48),
+            child: _ChatAppBar(
+              controller: TextEditingController(),
+              onUpdatePressed: () => bloc.add(ChatScreenUpdate()),
+            ),
+          ),
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 30),
+                  child: _ChatBody(
+                    messages: state.messages,
+                  ),
+                ),
+              ),
+              _ChatTextField(
+                  onSendPressed: () => bloc.add(ChatScreenSendMessage())),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
 
 class _ChatBody extends StatelessWidget {
-  final Iterable<ChatMessageDto> messages;
-  final ScrollController scrollController;
+  final Iterable<ChatMultiMessageDto> messages;
 
-  const _ChatBody(
-      {required this.messages, Key? key, required this.scrollController})
-      : super(key: key);
+  const _ChatBody({required this.messages, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
-      controller: scrollController,
+      controller: context.watch<ChatScreenBloc>().scrollController,
       physics: const BouncingScrollPhysics(),
       itemCount: messages.length,
       separatorBuilder: (_, __) => const SizedBox(height: 20),
@@ -103,17 +122,16 @@ class _ChatBody extends StatelessWidget {
 }
 
 class _ChatTextField extends StatelessWidget {
-  final ValueChanged<String> onSendPressed;
+  final VoidCallback onSendPressed;
 
-  final _textEditingController = TextEditingController();
-
-  _ChatTextField({
+  const _ChatTextField({
     required this.onSendPressed,
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var bloc = context.read<ChatScreenBloc>();
     final mediaQuery = MediaQuery.of(context);
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -124,20 +142,47 @@ class _ChatTextField extends StatelessWidget {
           bottom: mediaQuery.padding.bottom + 8,
           left: 16,
         ),
-        child: Row(
+        child: Column(
           children: [
-            Expanded(
-              child: TextField(
-                controller: _textEditingController,
-                decoration: const InputDecoration(
-                  hintText: 'Сообщение',
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () => bloc.add(ChatScreenLoadGeo()),
+                  icon: const Icon(Icons.place),
+                  color: colorScheme.primary,
                 ),
-              ),
+                Expanded(
+                  child: TextField(
+                    controller:
+                        context.watch<ChatScreenBloc>().textEditingController,
+                    decoration: const InputDecoration(
+                      hintText: 'Сообщение',
+                    ),
+                    onChanged: (value) =>
+                        bloc.add(ChatScreenTextChanged(value)),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => {onSendPressed()},
+                  icon: const Icon(Icons.send),
+                  color: colorScheme.primary,
+                ),
+              ],
             ),
-            IconButton(
-              onPressed: () => onSendPressed(_textEditingController.text),
-              icon: const Icon(Icons.send),
-              color: colorScheme.primary,
+            BlocBuilder<ChatScreenBloc, ChatScreenState>(
+              builder: (context, state) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    state.geolocationDto != null
+                        ? const Text('Location added')
+                        : Container(),
+                    state.images.isNotEmpty
+                        ? Text('Images count: ${state.images.length}')
+                        : Container(),
+                  ],
+                );
+              },
             ),
           ],
         ),
@@ -173,7 +218,7 @@ class _ChatAppBar extends StatelessWidget {
 }
 
 class _ChatMessage extends StatelessWidget {
-  final ChatMessageDto chatData;
+  final ChatMultiMessageDto chatData;
 
   const _ChatMessage({required this.chatData, Key? key}) : super(key: key);
 
@@ -181,6 +226,7 @@ class _ChatMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isMe = chatData.chatUserDto is ChatUserLocalDto;
+    DateFormat dateFormat = DateFormat('dd.MM.yy  HH:mm');
 
     final children = [
       _ChatAvatar(userData: chatData.chatUserDto),
@@ -203,12 +249,40 @@ class _ChatMessage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                chatData.chatUserDto.name ?? '',
+                chatData.chatUserDto.name ?? 'Аноним',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
-              Text(
-                chatData.message ?? '',
+              Text(chatData.message ?? ''),
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: _MessageImages(images: chatData.images),
+              ),
+              chatData.location != null
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        const Icon(Icons.place, size: 17),
+                        TextButton(
+                          onPressed: () {
+                            MapsLauncher.launchCoordinates(
+                                chatData.location!.latitude,
+                                chatData.location!.longitude);
+                          },
+                          child: const Text('Открыть в картах'),
+                        ),
+                        const Spacer(),
+                      ],
+                    )
+                  : const SizedBox.shrink(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    dateFormat.format(chatData.createdDateTime),
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                ],
               ),
             ],
           ),
@@ -217,7 +291,7 @@ class _ChatMessage extends StatelessWidget {
     ];
 
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxHeight: 350, minHeight: 40.0),
+      constraints: const BoxConstraints(maxHeight: 400, minHeight: 40.0),
       child: Row(
         mainAxisAlignment:
             isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -248,6 +322,13 @@ class _ChatAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // генерируем цвет на основе инициалов, чтобы добиться одинакового цвета на
+    // всех устройствах.
+    // для пустых инициалов константый цвет
+    int colorCode = iconText().isEmpty
+        ? 0xFFc3b7e7
+        : iconText().hashCode % 0xFFFFFF + 0xFF000000;
+    // / / / / / / / / / / / / / / / / / / / / / / / /
     final colorScheme = Theme.of(context).colorScheme;
     final isMe = userData is ChatUserLocalDto;
 
@@ -266,6 +347,45 @@ class _ChatAvatar extends StatelessWidget {
             color: isMe ? colorScheme.onPrimary : AppColors.textAvatarColor,
             fontWeight: FontWeight.bold,
             fontSize: 23,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MessageImages extends StatelessWidget {
+  List<String>? images;
+  _MessageImages({Key? key, this.images}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 8,
+      runSpacing: 8,
+      children: images != null
+          ? images!.map((e) => _SizedImage(url: e)).toList()
+          : [Container()],
+    );
+  }
+}
+
+class _SizedImage extends StatelessWidget {
+  const _SizedImage({Key? key, required this.url}) : super(key: key);
+  final String url;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 60,
+      width: 60,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8.0),
+        child: FittedBox(
+          fit: BoxFit.fill,
+          child: Image.network(
+            url,
           ),
         ),
       ),
