@@ -8,19 +8,18 @@ abstract class AppColors {
 
   static const messageCard = Color(0xFFEFF0E8);
   static const avatarColor = Color(0xFFD3D4B9);
-  static const textAvatarColor = Color(0xFFEFF0E8);
-  static const avatarBorder = Color(0x42000000);
-}
-
-abstract class TxtStyle {
-  // static const blender14 = TextStyle(fontFamily: 'blender', fontSize: 15);
-
-  // static const content14 = TextStyle(fontSize: 14.0, fontFamily: 'play');
-
-  // static const zelek14 = TextStyle(fontSize: 14.0, fontFamily: 'zelek');
+  static const textAvatarColor = Colors.black26;
+  static const avatarBorder = Colors.black;
 }
 
 final themeData = ThemeData(
-    scaffoldBackgroundColor: AppColors.scaffoldBackgroundColor,
-    colorScheme: ThemeData().colorScheme.copyWith(primary: AppColors.primary),
-    backgroundColor: AppColors.backgroundColor);
+  scaffoldBackgroundColor: AppColors.scaffoldBackgroundColor,
+  colorScheme: ThemeData().colorScheme.copyWith(
+      primary: AppColors.primary, background: AppColors.backgroundColor),
+);
+
+class AppImages {
+  AppImages._();
+
+  static const String peesetz = 'assets/images/peesetz.jpg';
+}

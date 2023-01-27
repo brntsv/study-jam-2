@@ -27,7 +27,10 @@ dev_dependencies:
     sdk: flutter
 flutter:
   uses-material-design: true
-  # assets:
+
+  assets:
+    - assets/images/
+
   fonts:
     - family: zelek
       fonts:

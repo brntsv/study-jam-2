@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maps_launcher/maps_launcher.dart';
@@ -255,7 +254,7 @@ class _ChatMessage extends StatelessWidget {
               const SizedBox(height: 4),
               Text(chatData.message ?? ''),
               Padding(
-                padding: const EdgeInsets.only(top: 8),
+                padding: const EdgeInsets.only(top: 8, bottom: 4),
                 child: _MessageImages(images: chatData.images),
               ),
               chatData.location != null
@@ -264,12 +263,22 @@ class _ChatMessage extends StatelessWidget {
                       children: [
                         const Icon(Icons.place, size: 17),
                         TextButton(
+                          style: TextButton.styleFrom(
+                            minimumSize: Size.zero,
+                            padding: EdgeInsets.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
                           onPressed: () {
                             MapsLauncher.launchCoordinates(
                                 chatData.location!.latitude,
                                 chatData.location!.longitude);
                           },
-                          child: const Text('Открыть в картах'),
+                          child: Text(
+                            'Открыть в картах',
+                            style: TextStyle(
+                              color: isMe ? Colors.black : colorScheme.primary,
+                            ),
+                          ),
                         ),
                         const Spacer(),
                       ],
@@ -291,7 +300,7 @@ class _ChatMessage extends StatelessWidget {
     ];
 
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxHeight: 400, minHeight: 40.0),
+      constraints: const BoxConstraints(maxHeight: 500, minHeight: 40.0),
       child: Row(
         mainAxisAlignment:
             isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -323,8 +332,7 @@ class _ChatAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // генерируем цвет на основе инициалов, чтобы добиться одинакового цвета на
-    // всех устройствах.
-    // для пустых инициалов константый цвет
+    // всех устройствах. Для пустых инициалов константый цвет
     int colorCode = iconText().isEmpty
         ? 0xFFc3b7e7
         : iconText().hashCode % 0xFFFFFF + 0xFF000000;
@@ -340,7 +348,7 @@ class _ChatAvatar extends StatelessWidget {
           ),
           borderRadius: const BorderRadius.all(Radius.circular(50.0))),
       child: CircleAvatar(
-        backgroundColor: isMe ? colorScheme.primary : AppColors.avatarColor,
+        backgroundColor: isMe ? colorScheme.primary : Color(colorCode),
         child: Text(
           iconText(),
           style: TextStyle(
@@ -383,11 +391,11 @@ class _SizedImage extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8.0),
         child: FittedBox(
-          fit: BoxFit.fill,
-          child: Image.network(
-            url,
-          ),
-        ),
+            fit: BoxFit.fill,
+            child: Image.network(url,
+                errorBuilder: (context, exception, stackTrace) {
+              return const Text('😤');
+            })),
       ),
     );
   }
