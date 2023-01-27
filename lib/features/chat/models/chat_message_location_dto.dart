@@ -9,7 +9,7 @@ class ChatMessageGeolocationDto extends ChatMessageDto {
   final ChatGeolocationDto location;
 
   /// Constructor for [ChatMessageGeolocationDto].
-  ChatMessageGeolocationDto({
+  const ChatMessageGeolocationDto({
     required ChatUserDto chatUserDto,
     required this.location,
     required String message,
@@ -32,5 +32,6 @@ class ChatMessageGeolocationDto extends ChatMessageDto {
         );
 
   @override
-  String toString() => 'ChatMessageGeolocationDto(location: $location) extends ${super.toString()}';
+  String toString() =>
+      'ChatMessageGeolocationDto(location: $location) extends ${super.toString()}';
 }
