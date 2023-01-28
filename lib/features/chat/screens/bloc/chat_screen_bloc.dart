@@ -25,9 +25,9 @@ class ChatScreenBloc extends Bloc<ChatScreenEvent, ChatScreenState> {
     on<ChatScreenUpdate>(_onUpdate);
     on<ChatScreenTextChanged>(_onTextChanged);
     on<ChatScreenSendMessage>(_onSendMessage);
-    on<ChatScreenShowStickerKeyboard>(_onShowKeyboard);
-    on<ChatScreenHideStickerKeyboard>(_onHideKeyboard);
-    on<ChatScreenChangeStickerKeyboard>(_onChangeKeyboard);
+    on<ChatScreenShowGallery>(_onShowGallery);
+    on<ChatScreenHideGallery>(_onHideGallery);
+    on<ChatScreenChoosePhoto>(_onChangeGallery);
     on<ChatScreenLoadGeo>(_onLoadGeo);
     on<ChatScreenLoadImage>(_onLoadImage);
   }
@@ -52,7 +52,7 @@ class ChatScreenBloc extends Bloc<ChatScreenEvent, ChatScreenState> {
 
   Future<void> _onSendMessage(
       ChatScreenSendMessage event, Emitter<ChatScreenState> emit) async {
-    add(ChatScreenHideStickerKeyboard());
+    add(ChatScreenHideGallery());
     print('sendOnMult');
     print(
         'state: chayId $chatId, geo = ${state.geolocationDto} mes = ${state.messageText} iamges = ${state.images}');
@@ -67,19 +67,19 @@ class ChatScreenBloc extends Bloc<ChatScreenEvent, ChatScreenState> {
     add(ChatScreenUpdate());
   }
 
-  void _onShowKeyboard(
-      ChatScreenShowStickerKeyboard event, Emitter<ChatScreenState> emit) {
+  void _onShowGallery(
+      ChatScreenShowGallery event, Emitter<ChatScreenState> emit) {
     emit(state.copyWith(isStickerKeyboard: true));
   }
 
-  void _onHideKeyboard(
-      ChatScreenHideStickerKeyboard event, Emitter<ChatScreenState> emit) {
+  void _onHideGallery(
+      ChatScreenHideGallery event, Emitter<ChatScreenState> emit) {
     emit(state.copyWith(isStickerKeyboard: false));
   }
 
-  void _onChangeKeyboard(
-      ChatScreenChangeStickerKeyboard event, Emitter<ChatScreenState> emit) {
-    emit(state.copyWith(isStickerKeyboard: false));
+  void _onChangeGallery(
+      ChatScreenChoosePhoto event, Emitter<ChatScreenState> emit) {
+    emit(state.copyWith(isStickerKeyboard: !state.isStickerKeyboard));
   }
 
   Future<void> _onLoadGeo(

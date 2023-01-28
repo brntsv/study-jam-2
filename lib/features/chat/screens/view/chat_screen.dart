@@ -1,6 +1,9 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:surf_practice_chat_flutter/features/chat/models/cha_multi_message_dto.dart';
 import 'package:surf_study_jam/surf_study_jam.dart';
@@ -25,12 +28,6 @@ class ChatScreen extends StatelessWidget {
     required this.chatId,
     this.chatTitle,
   }) : super(key: key);
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _onUpdatePressed();
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -94,6 +91,7 @@ class ChatView extends StatelessWidget {
               ),
               _ChatTextField(
                   onSendPressed: () => bloc.add(ChatScreenSendMessage())),
+              _StickerPicker(),
             ],
           ),
         );
@@ -121,13 +119,32 @@ class _ChatBody extends StatelessWidget {
   }
 }
 
-class _ChatTextField extends StatelessWidget {
+class _ChatTextField extends StatefulWidget {
   final VoidCallback onSendPressed;
 
   const _ChatTextField({
     required this.onSendPressed,
     Key? key,
   }) : super(key: key);
+
+  @override
+  State<_ChatTextField> createState() => _ChatTextFieldState();
+}
+
+class _ChatTextFieldState extends State<_ChatTextField> {
+  File? image;
+
+  Future pickImage(ImageSource source) async {
+    try {
+      final image = await ImagePicker().pickImage(source: source);
+      if (image == null) return;
+
+      final imageTemporary = File(image.path);
+      setState(() => this.image = imageTemporary);
+    } on PlatformException catch (e) {
+      print('Failed to pick image: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -150,6 +167,17 @@ class _ChatTextField extends StatelessWidget {
                   onPressed: () => bloc.add(ChatScreenLoadGeo()),
                   icon: const Icon(Icons.place),
                   color: colorScheme.primary,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+                IconButton(
+                  onPressed: () => {
+                    pickImage(ImageSource.gallery),
+                  },
+                  icon: const Icon(Icons.attach_file),
+                  color: colorScheme.onSurface,
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  constraints: const BoxConstraints(),
                 ),
                 Expanded(
                   child: TextField(
@@ -163,7 +191,7 @@ class _ChatTextField extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  onPressed: () => {onSendPressed()},
+                  onPressed: () => {widget.onSendPressed()},
                   icon: const Icon(Icons.send),
                   color: colorScheme.primary,
                 ),
@@ -255,7 +283,7 @@ class _ChatMessage extends StatelessWidget {
               const SizedBox(height: 4),
               Text(chatData.message ?? ''),
               Padding(
-                padding: const EdgeInsets.only(top: 8),
+                padding: const EdgeInsets.only(top: 8, bottom: 4),
                 child: _MessageImages(images: chatData.images),
               ),
               chatData.location != null
@@ -264,12 +292,22 @@ class _ChatMessage extends StatelessWidget {
                       children: [
                         const Icon(Icons.place, size: 17),
                         TextButton(
+                          style: TextButton.styleFrom(
+                            minimumSize: Size.zero,
+                            padding: EdgeInsets.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
                           onPressed: () {
                             MapsLauncher.launchCoordinates(
                                 chatData.location!.latitude,
                                 chatData.location!.longitude);
                           },
-                          child: const Text('Открыть в картах'),
+                          child: Text(
+                            'Открыть в картах',
+                            style: TextStyle(
+                              color: isMe ? Colors.black : colorScheme.primary,
+                            ),
+                          ),
                         ),
                         const Spacer(),
                       ],
@@ -291,7 +329,7 @@ class _ChatMessage extends StatelessWidget {
     ];
 
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxHeight: 400, minHeight: 40.0),
+      constraints: const BoxConstraints(maxHeight: 500, minHeight: 40.0),
       child: Row(
         mainAxisAlignment:
             isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -323,8 +361,7 @@ class _ChatAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // генерируем цвет на основе инициалов, чтобы добиться одинакового цвета на
-    // всех устройствах.
-    // для пустых инициалов константый цвет
+    // всех устройствах. Для пустых инициалов константый цвет
     int colorCode = iconText().isEmpty
         ? 0xFFc3b7e7
         : iconText().hashCode % 0xFFFFFF + 0xFF000000;
@@ -340,7 +377,7 @@ class _ChatAvatar extends StatelessWidget {
           ),
           borderRadius: const BorderRadius.all(Radius.circular(50.0))),
       child: CircleAvatar(
-        backgroundColor: isMe ? colorScheme.primary : AppColors.avatarColor,
+        backgroundColor: isMe ? colorScheme.primary : Color(colorCode),
         child: Text(
           iconText(),
           style: TextStyle(
@@ -383,12 +420,54 @@ class _SizedImage extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8.0),
         child: FittedBox(
-          fit: BoxFit.fill,
-          child: Image.network(
-            url,
-          ),
-        ),
+            fit: BoxFit.fill,
+            child: Image.network(url,
+                errorBuilder: (context, exception, stackTrace) {
+              return const Text('😤');
+            })),
       ),
+    );
+  }
+}
+
+class _StickerPicker extends StatelessWidget {
+  const _StickerPicker({Key? key}) : super(key: key);
+
+  static const List<String> stickers = [
+    'https://sun3-12.userapi.com/impg/FeGFctka6L1E_Wm2baFbGrT5GDZYE2OtN7jQKA/SmCYAC4R1-E.jpg?size=914x900&quality=95&sign=c342cbca05abeefc26b059e03fccd29a&type=album',
+    'https://sun3-9.userapi.com/impg/4UBEfXFtwMfABor9tRcZwN7Lvq3d7tWPqyjBLw/UguKZZdIa_k.jpg?size=2560x1600&quality=95&sign=24aed6f64f43db6e77202bf4886669b7&type=album',
+    'https://sun3-10.userapi.com/impg/nBjolMeOuziMgYElezocLcqLShsjBFVP6Gs7BQ/TF4wDbcJ-Co.jpg?size=2500x1667&quality=96&sign=6ab8dc87862202688809f9fa3cd237d5&type=album'
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    var bloc = context.read<ChatScreenBloc>();
+
+    return BlocBuilder<ChatScreenBloc, ChatScreenState>(
+      builder: (context, state) {
+        if (state.isStickerKeyboard) {
+          return Material(
+            child: SizedBox(
+              height: 100,
+              child: ListView.builder(
+                  itemCount: stickers.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (BuildContext context, int index) {
+                    return GestureDetector(
+                      onTap: () {
+                        bloc.add(ChatScreenLoadImage(stickers[index]));
+                      },
+                      child: Image.network(
+                        stickers[index],
+                      ),
+                    );
+                  }),
+            ),
+          );
+        } else {
+          return Container();
+        }
+      },
     );
   }
 }

@@ -22,11 +22,11 @@ class ChatScreenSendMessage extends ChatScreenEvent {}
 
 class ChatScreenLoadGeo extends ChatScreenEvent {}
 
-class ChatScreenShowStickerKeyboard extends ChatScreenEvent {}
+class ChatScreenShowGallery extends ChatScreenEvent {}
 
-class ChatScreenHideStickerKeyboard extends ChatScreenEvent {}
+class ChatScreenHideGallery extends ChatScreenEvent {}
 
-class ChatScreenChangeStickerKeyboard extends ChatScreenEvent {}
+class ChatScreenChoosePhoto extends ChatScreenEvent {}
 
 class ChatScreenLoadImage extends ChatScreenEvent {
   const ChatScreenLoadImage(this.url);
