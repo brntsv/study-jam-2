@@ -40,9 +40,10 @@ class CreateTopicView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextField(
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Название топика',
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15)),
                 ),
                 onChanged: (value) {
                   bloc.add(CreateTopicScreenTitleChanged(value));
@@ -52,9 +53,10 @@ class CreateTopicView extends StatelessWidget {
                 height: 8,
               ),
               TextField(
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Описание',
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15)),
                 ),
                 onChanged: (value) {
                   bloc.add(CreateTopicScreenDescriptionChanged(value));
