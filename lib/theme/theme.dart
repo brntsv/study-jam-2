@@ -17,9 +17,3 @@ final themeData = ThemeData(
   colorScheme: ThemeData().colorScheme.copyWith(
       primary: AppColors.primary, background: AppColors.backgroundColor),
 );
-
-class AppImages {
-  AppImages._();
-
-  static const String peesetz = 'assets/images/peesetz.jpg';
-}

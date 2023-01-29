@@ -41,7 +41,7 @@ class CreateTopicView extends StatelessWidget {
             children: [
               TextField(
                 decoration: const InputDecoration(
-                  labelText: 'Title',
+                  labelText: 'Название топика',
                   border: OutlineInputBorder(),
                 ),
                 onChanged: (value) {
@@ -53,7 +53,7 @@ class CreateTopicView extends StatelessWidget {
               ),
               TextField(
                 decoration: const InputDecoration(
-                  labelText: 'Description',
+                  labelText: 'Описание',
                   border: OutlineInputBorder(),
                 ),
                 onChanged: (value) {
@@ -67,7 +67,7 @@ class CreateTopicView extends StatelessWidget {
                 onPressed: () {
                   bloc.add(CreateTopicScreenCreate());
                 },
-                child: const Text('Continue'),
+                child: const Text('Создать'),
               ),
             ],
           ),

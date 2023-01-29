@@ -32,13 +32,15 @@ class ChatScreen extends StatelessWidget {
       create: (context) =>
           ChatScreenBloc(client: client, chatId: chatId, chatTitle: chatTitle)
             ..add(ChatScreenUpdate()),
-      child: const ChatView(),
+      child: ChatView(chatTitle: chatTitle),
     );
   }
 }
 
 class ChatView extends StatelessWidget {
-  const ChatView({Key? key}) : super(key: key);
+  const ChatView({Key? key, required this.chatTitle}) : super(key: key);
+
+  final String? chatTitle;
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +53,7 @@ class ChatView extends StatelessWidget {
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(48),
             child: _ChatAppBar(
+              chatTitle: chatTitle,
               controller: TextEditingController(),
               onUpdatePressed: () => bloc.add(ChatScreenUpdate()),
             ),
@@ -99,10 +102,8 @@ class _ChatBody extends StatelessWidget {
 class _ChatTextField extends StatelessWidget {
   final VoidCallback onSendPressed;
 
-  const _ChatTextField({
-    required this.onSendPressed,
-    Key? key,
-  }) : super(key: key);
+  const _ChatTextField({required this.onSendPressed, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -183,10 +184,12 @@ class _ChatTextField extends StatelessWidget {
 class _ChatAppBar extends StatelessWidget {
   final VoidCallback onUpdatePressed;
   final TextEditingController controller;
+  final String? chatTitle;
 
   const _ChatAppBar({
     required this.onUpdatePressed,
     required this.controller,
+    required this.chatTitle,
     Key? key,
   }) : super(key: key);
 
@@ -194,8 +197,14 @@ class _ChatAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppBar(
       title: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          Flexible(
+            child: Text(
+              '$chatTitle',
+              overflow: TextOverflow.fade,
+            ),
+          ),
           IconButton(
             onPressed: onUpdatePressed,
             icon: const Icon(Icons.refresh),
@@ -407,7 +416,7 @@ class _SizedImage extends StatelessWidget {
                           padding: const EdgeInsets.all(25.0),
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: colorScheme.primary,
+                            color: colorScheme.primary.withOpacity(0.5),
                           ),
                         )
                       : Image(image: NetworkImage(snapshot.data!));
@@ -421,9 +430,14 @@ class _StickerPicker extends StatelessWidget {
   const _StickerPicker({Key? key}) : super(key: key);
 
   static const List<String> stickers = [
-    'https://sun3-12.userapi.com/impg/FeGFctka6L1E_Wm2baFbGrT5GDZYE2OtN7jQKA/SmCYAC4R1-E.jpg?size=914x900&quality=95&sign=c342cbca05abeefc26b059e03fccd29a&type=album',
-    'https://sun3-9.userapi.com/impg/4UBEfXFtwMfABor9tRcZwN7Lvq3d7tWPqyjBLw/UguKZZdIa_k.jpg?size=2560x1600&quality=95&sign=24aed6f64f43db6e77202bf4886669b7&type=album',
-    'https://sun3-10.userapi.com/impg/nBjolMeOuziMgYElezocLcqLShsjBFVP6Gs7BQ/TF4wDbcJ-Co.jpg?size=2500x1667&quality=96&sign=6ab8dc87862202688809f9fa3cd237d5&type=album'
+    'https://chpic.su/_data/stickers/y/Yellowboi/Yellowboi_030.webp',
+    'https://chpic.su/_data/stickers/y/Yellowboi/Yellowboi_027.webp',
+    'https://chpic.su/_data/stickers/y/Yellowboi/Yellowboi_007.webp',
+    'https://chpic.su/_data/stickers/y/Yellowboi/Yellowboi_056.webp',
+    'https://chpic.su/_data/stickers/y/Yellowboi/Yellowboi_050.webp',
+    'https://chpic.su/_data/stickers/y/Yellowboi/Yellowboi_014.webp',
+    'https://chpic.su/_data/stickers/y/Yellowboi/Yellowboi_043.webp',
+    'https://chpic.su/_data/stickers/y/Yellowboi/Yellowboi_001.webp',
   ];
 
   @override
