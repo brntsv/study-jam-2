@@ -4,7 +4,40 @@
 <img src="https://surf.ru/wp-content/themes/surf/assets/img/logo.svg" height="120" />
 </p>
 
+
+> Приложение - чат, с подключением к серверу на Firebase.\
+> Аутентификация, топики и сам чат на блоке. Спасибо сюрфу за такие ивенты и макеты\
+> <img src=https://github.com/brntsv/study-jam-2/raw/main/docs/assets/presentation/coolman.webp width="80"/>
+
+## Stack
++ Dart
++ Flutter
++ BloC
++ geolocator
++ shared preferences
+
+## Screenshots
+
+| *Auth screen*  | *Topics screen* |
+| ------------- | ------------- |
+| ![auth screen](https://github.com/brntsv/study-jam-2/raw/main/docs/assets/presentation/auth.png)  | ![topics screen](https://github.com/brntsv/study-jam-2/raw/main/docs/assets/presentation/topics.png)  |
+
+
+| *Chat screen*  | *Chat Screen* |
+| ------------- | ------------- |
+| ![chat screen](https://github.com/brntsv/study-jam-2/raw/main/docs/assets/presentation/chat.png)  | ![chat Screen](https://github.com/brntsv/study-jam-2/raw/main/docs/assets/presentation/chat.gif)  |
+
+
+| *Create topic*  | *Created topic* |
+| ------------- | ------------- |
+| ![create topic](https://github.com/brntsv/study-jam-2/raw/main/docs/assets/presentation/create_topic.png)  | ![created topic](https://github.com/brntsv/study-jam-2/raw/main/docs/assets/presentation/created_chat.png)  |
+
+
 ## Требования к приложению
+<details>
+
+<summary> Развернуть </summary>
+
 
 - Версия Flutter: **3.0.5**
 - Версия Dart: **2.17.1**
@@ -107,4 +140,6 @@
 Успели сделать все задания раньше всех или просто хотите выделиться? Доработайте чат по своему усмотрению!
 
 Метод `sendMessage` помимо прочего принимает параметр `payload` типа `Playload`. Этот метод нужен для того, чтобы вы могли добавить к сообщению любые данные, которые захотите.
+
+</details>
 
