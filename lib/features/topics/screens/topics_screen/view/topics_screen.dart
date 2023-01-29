@@ -66,6 +66,7 @@ class TopicsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<TopicsScreenBloc>();
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -92,6 +93,10 @@ class TopicsView extends StatelessWidget {
         builder: (context, state) {
           final chats = state.chats;
           return LiquidPullToRefresh(
+            color: colorScheme.primary.withOpacity(0.6),
+            height: 50,
+            springAnimationDurationInMilliseconds: 300,
+            showChildOpacityTransition: false,
             onRefresh: () async {
               bloc.add(TopicsScreenUpdate());
             },
@@ -134,16 +139,15 @@ class _TopicAvatar extends StatelessWidget {
       result = title!.split(' ').first[0];
       try {
         result += title!.split(' ').last[0];
-      } catch (e) {}
+      } catch (e) {
+        print(e);
+      }
     }
     return result;
   }
 
   @override
   Widget build(BuildContext context) {
-    // генерируем цвет на основе инициалов, чтобы добиться одинакового цвета на
-    // всех устройствах.
-    // для пустых инициалов константый цвет
     int colorCode = iconText().isEmpty
         ? 0xFFc3b7e7
         : iconText().hashCode % 0xFFFFFF + 0xFF000000;

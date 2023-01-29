@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:surf_study_jam/surf_study_jam.dart';
@@ -49,7 +49,8 @@ class TopicsScreenBloc extends Bloc<TopicsScreenEvent, TopicsScreenState> {
     emit(state.copyWith(status: TopicsScreenStatus.initial));
   }
 
-  void _onCreate(TopicsScreenCreate event, Emitter<TopicsScreenState> emit) {
+  void _onCreate(
+      TopicsScreenCreate event, Emitter<TopicsScreenState> emit) async {
     emit(state.copyWith(status: TopicsScreenStatus.createNew));
     emit(state.copyWith(status: TopicsScreenStatus.initial));
   }

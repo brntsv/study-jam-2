@@ -8,7 +8,8 @@ class ChatScreenState extends Equatable {
   final String messageText;
   final ChatGeolocationDto? geolocationDto;
   final bool isStickerKeyboard;
-  final List<String> images;
+  final List<String> stickers;
+  // final List<XFile>? images;
 
   const ChatScreenState({
     required this.messages,
@@ -16,7 +17,8 @@ class ChatScreenState extends Equatable {
     required this.messageText,
     required this.geolocationDto,
     required this.isStickerKeyboard,
-    required this.images,
+    required this.stickers,
+    // required this.images,
   });
 
   const ChatScreenState.initial()
@@ -25,11 +27,12 @@ class ChatScreenState extends Equatable {
         messageText = '',
         geolocationDto = null,
         isStickerKeyboard = false,
-        images = const [];
+        stickers = const [];
+  // images = const [];
 
   @override
   List<Object> get props =>
-      [messages, status, messageText, isStickerKeyboard, images];
+      [messages, status, messageText, isStickerKeyboard, stickers];
 
   const ChatScreenState.clear()
       : messages = const [],
@@ -37,7 +40,8 @@ class ChatScreenState extends Equatable {
         messageText = '',
         geolocationDto = null,
         isStickerKeyboard = false,
-        images = const [];
+        stickers = const [];
+  // images = const [];
 
   ChatScreenState copyWith({
     Iterable<ChatMultiMessageDto>? messages,
@@ -45,7 +49,8 @@ class ChatScreenState extends Equatable {
     String? messageText,
     ChatGeolocationDto? geolocationDto,
     bool? isStickerKeyboard,
-    List<String>? images,
+    List<String>? stickers,
+    // List<XFile>? images,
   }) {
     return ChatScreenState(
       messages: messages ?? this.messages,
@@ -53,7 +58,8 @@ class ChatScreenState extends Equatable {
       messageText: messageText ?? this.messageText,
       geolocationDto: geolocationDto ?? this.geolocationDto,
       isStickerKeyboard: isStickerKeyboard ?? this.isStickerKeyboard,
-      images: images ?? this.images,
+      stickers: stickers ?? this.stickers,
+      // images: images ?? this.images,
     );
   }
 }

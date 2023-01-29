@@ -25,11 +25,13 @@ class ChatScreenBloc extends Bloc<ChatScreenEvent, ChatScreenState> {
     on<ChatScreenUpdate>(_onUpdate);
     on<ChatScreenTextChanged>(_onTextChanged);
     on<ChatScreenSendMessage>(_onSendMessage);
-    on<ChatScreenShowGallery>(_onShowGallery);
-    on<ChatScreenHideGallery>(_onHideGallery);
-    on<ChatScreenChoosePhoto>(_onChangeGallery);
+    on<ChatScreenShowStickers>(_onShowGallery);
+    on<ChatScreenHideStickers>(_onHideGallery);
+    on<ChatScreenChooseSticker>(_onChangeGallery);
     on<ChatScreenLoadGeo>(_onLoadGeo);
-    on<ChatScreenLoadImage>(_onLoadImage);
+    on<ChatScreenLoadSticker>(_onLoadSticker);
+    // on<ChatScreenSelectImages>(_onSelectImages);
+    // on<ChatScreenUnselectImages>(_onUnselectImages);
   }
 
   Future<void> _onUpdate(
@@ -39,7 +41,8 @@ class ChatScreenBloc extends Bloc<ChatScreenEvent, ChatScreenState> {
       final messages = await _chatRepository.getMessagesByChatId(chatId);
       print('_onUpdate mes:$messages len ${messages.length}, chatid $chatId');
       emit(state.copyWith(messages: messages, status: ChatScreenStatus.loaded));
-      scrollController.jumpTo(scrollController.position.maxScrollExtent);
+      scrollController.jumpTo(
+          scrollController.position.maxScrollExtent + messages.length * 200);
     } catch (e) {
       print(e);
     }
@@ -52,14 +55,14 @@ class ChatScreenBloc extends Bloc<ChatScreenEvent, ChatScreenState> {
 
   Future<void> _onSendMessage(
       ChatScreenSendMessage event, Emitter<ChatScreenState> emit) async {
-    add(ChatScreenHideGallery());
+    add(ChatScreenHideStickers());
     print('sendOnMult');
     print(
-        'state: chayId $chatId, geo = ${state.geolocationDto} mes = ${state.messageText} iamges = ${state.images}');
+        'state: chayId $chatId, geo = ${state.geolocationDto} mes = ${state.messageText} iamges = ${state.stickers}');
     await _chatRepository.sendMultiMessage(
       location: state.geolocationDto,
       message: state.messageText,
-      images: state.images,
+      images: state.stickers,
       chatId: chatId,
     );
     textEditingController.clear();
@@ -68,17 +71,17 @@ class ChatScreenBloc extends Bloc<ChatScreenEvent, ChatScreenState> {
   }
 
   void _onShowGallery(
-      ChatScreenShowGallery event, Emitter<ChatScreenState> emit) {
+      ChatScreenShowStickers event, Emitter<ChatScreenState> emit) {
     emit(state.copyWith(isStickerKeyboard: true));
   }
 
   void _onHideGallery(
-      ChatScreenHideGallery event, Emitter<ChatScreenState> emit) {
+      ChatScreenHideStickers event, Emitter<ChatScreenState> emit) {
     emit(state.copyWith(isStickerKeyboard: false));
   }
 
   void _onChangeGallery(
-      ChatScreenChoosePhoto event, Emitter<ChatScreenState> emit) {
+      ChatScreenChooseSticker event, Emitter<ChatScreenState> emit) {
     emit(state.copyWith(isStickerKeyboard: !state.isStickerKeyboard));
   }
 
@@ -98,7 +101,18 @@ class ChatScreenBloc extends Bloc<ChatScreenEvent, ChatScreenState> {
     emit(state.copyWith(geolocationDto: gDto, status: ChatScreenStatus.loaded));
   }
 
-  void _onLoadImage(ChatScreenLoadImage event, Emitter<ChatScreenState> emit) {
-    emit(state.copyWith(images: [...state.images, event.url]));
+  void _onLoadSticker(
+      ChatScreenLoadSticker event, Emitter<ChatScreenState> emit) {
+    emit(state.copyWith(stickers: [...state.stickers, event.url]));
   }
+
+  // void _onSelectImages(
+  //     ChatScreenSelectImages event, Emitter<ChatScreenState> emit) {
+  //   emit(state.copyWith(images: event.image));
+  // }
+
+  // void _onUnselectImages(
+  //     ChatScreenUnselectImages event, Emitter<ChatScreenState> emit) {
+  //   emit(state.copyWith(images: null));
+  // }
 }

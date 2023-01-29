@@ -22,15 +22,24 @@ class ChatScreenSendMessage extends ChatScreenEvent {}
 
 class ChatScreenLoadGeo extends ChatScreenEvent {}
 
-class ChatScreenShowGallery extends ChatScreenEvent {}
+class ChatScreenShowStickers extends ChatScreenEvent {}
 
-class ChatScreenHideGallery extends ChatScreenEvent {}
+class ChatScreenHideStickers extends ChatScreenEvent {}
 
-class ChatScreenChoosePhoto extends ChatScreenEvent {}
+class ChatScreenChooseSticker extends ChatScreenEvent {}
 
-class ChatScreenLoadImage extends ChatScreenEvent {
-  const ChatScreenLoadImage(this.url);
+class ChatScreenLoadSticker extends ChatScreenEvent {
+  const ChatScreenLoadSticker(this.url);
   final String url;
   @override
   List<Object?> get props => [url];
 }
+
+// class ChatScreenSelectImages extends ChatScreenEvent {
+//   const ChatScreenSelectImages(this.image);
+//   final List<XFile> image;
+//   @override
+//   List<Object?> get props => [image];
+// }
+
+// class ChatScreenUnselectImages extends ChatScreenEvent {}

@@ -1,9 +1,6 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:surf_practice_chat_flutter/features/chat/models/cha_multi_message_dto.dart';
 import 'package:surf_study_jam/surf_study_jam.dart';
@@ -38,26 +35,6 @@ class ChatScreen extends StatelessWidget {
       child: const ChatView(),
     );
   }
-
-  // Future<void> _onUpdatePressed() async {
-  //   final messages = await widget.chatRepository.getMessages();
-  //   setState(() {
-  //     _currentMessages = messages;
-  //   });
-  //   scrollToEnd();
-  // }
-
-  // void scrollToEnd() {
-  //   scrollController
-  //       .jumpTo(scrollController.position.maxScrollExtent + 1000000);
-  // }
-
-  // Future<void> _onSendPressed(String messageText) async {
-  //   final messages = await widget.chatRepository.sendMessage(messageText);
-  //   setState(() {
-  //     _currentMessages = messages;
-  //   });
-  // }
 }
 
 class ChatView extends StatelessWidget {
@@ -91,7 +68,7 @@ class ChatView extends StatelessWidget {
               ),
               _ChatTextField(
                   onSendPressed: () => bloc.add(ChatScreenSendMessage())),
-              _StickerPicker(),
+              const _StickerPicker(),
             ],
           ),
         );
@@ -119,32 +96,13 @@ class _ChatBody extends StatelessWidget {
   }
 }
 
-class _ChatTextField extends StatefulWidget {
+class _ChatTextField extends StatelessWidget {
   final VoidCallback onSendPressed;
 
   const _ChatTextField({
     required this.onSendPressed,
     Key? key,
   }) : super(key: key);
-
-  @override
-  State<_ChatTextField> createState() => _ChatTextFieldState();
-}
-
-class _ChatTextFieldState extends State<_ChatTextField> {
-  File? image;
-
-  Future pickImage(ImageSource source) async {
-    try {
-      final image = await ImagePicker().pickImage(source: source);
-      if (image == null) return;
-
-      final imageTemporary = File(image.path);
-      setState(() => this.image = imageTemporary);
-    } on PlatformException catch (e) {
-      print('Failed to pick image: $e');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -171,8 +129,8 @@ class _ChatTextFieldState extends State<_ChatTextField> {
                   constraints: const BoxConstraints(),
                 ),
                 IconButton(
-                  onPressed: () => {
-                    pickImage(ImageSource.gallery),
+                  onPressed: () {
+                    bloc.add(ChatScreenChooseSticker());
                   },
                   icon: const Icon(Icons.attach_file),
                   color: colorScheme.onSurface,
@@ -191,7 +149,7 @@ class _ChatTextFieldState extends State<_ChatTextField> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () => {widget.onSendPressed()},
+                  onPressed: () => onSendPressed(),
                   icon: const Icon(Icons.send),
                   color: colorScheme.primary,
                 ),
@@ -205,9 +163,12 @@ class _ChatTextFieldState extends State<_ChatTextField> {
                     state.geolocationDto != null
                         ? const Text('Location added')
                         : Container(),
-                    state.images.isNotEmpty
-                        ? Text('Images count: ${state.images.length}')
+                    state.stickers.isNotEmpty
+                        ? Text('Stickers count: ${state.stickers.length}')
                         : Container(),
+                    // state.images != null
+                    //     ? Text('Images count: ${state.images!.length}')
+                    //     : Container(),
                   ],
                 );
               },
@@ -412,8 +373,23 @@ class _SizedImage extends StatelessWidget {
   const _SizedImage({Key? key, required this.url}) : super(key: key);
   final String url;
 
+  Future<String?> getImgUrl() async {
+    try {
+      Uint8List bytes = (await NetworkAssetBundle(Uri.parse(url)).load(url))
+          .buffer
+          .asUint8List();
+      print('The image exists!');
+      return url;
+    } catch (e) {
+      print('Error: $e');
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return SizedBox(
       height: 60,
       width: 60,
@@ -421,10 +397,21 @@ class _SizedImage extends StatelessWidget {
         borderRadius: BorderRadius.circular(8.0),
         child: FittedBox(
             fit: BoxFit.fill,
-            child: Image.network(url,
-                errorBuilder: (context, exception, stackTrace) {
-              return const Text('😤');
-            })),
+            child: FutureBuilder(
+                future: getImgUrl(),
+                builder:
+                    (BuildContext context, AsyncSnapshot<String?> snapshot) {
+                  bool error = snapshot.data == null;
+                  return error
+                      ? Padding(
+                          padding: const EdgeInsets.all(25.0),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: colorScheme.primary,
+                          ),
+                        )
+                      : Image(image: NetworkImage(snapshot.data!));
+                })),
       ),
     );
   }
@@ -455,7 +442,7 @@ class _StickerPicker extends StatelessWidget {
                   itemBuilder: (BuildContext context, int index) {
                     return GestureDetector(
                       onTap: () {
-                        bloc.add(ChatScreenLoadImage(stickers[index]));
+                        bloc.add(ChatScreenLoadSticker(stickers[index]));
                       },
                       child: Image.network(
                         stickers[index],
