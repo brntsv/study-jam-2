@@ -4,19 +4,19 @@ enum CreateTopicScreenStatus { initial, loading, success }
 
 class CreateTopicScreenState extends Equatable {
   const CreateTopicScreenState(
-      {required this.status, required this.name, required this.description});
+      {required this.status, required this.title, required this.description});
 
   const CreateTopicScreenState.initial()
       : status = CreateTopicScreenStatus.initial,
-        name = '',
+        title = '',
         description = '';
 
   final CreateTopicScreenStatus status;
-  final String name;
+  final String title;
   final String description;
 
   @override
-  List<Object> get props => [status, name, description];
+  List<Object> get props => [status, title, description];
 
   CreateTopicScreenState copyWith({
     CreateTopicScreenStatus? status,
@@ -25,7 +25,7 @@ class CreateTopicScreenState extends Equatable {
   }) {
     return CreateTopicScreenState(
       status: status ?? this.status,
-      name: title ?? this.name,
+      title: title ?? this.title,
       description: description ?? this.description,
     );
   }

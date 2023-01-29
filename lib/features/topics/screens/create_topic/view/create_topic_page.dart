@@ -7,19 +7,18 @@ class CreateTopicPage extends StatelessWidget {
   const CreateTopicPage({Key? key, required this.client}) : super(key: key);
   final StudyJamClient client;
 
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => CreateTopicScreenBloc(client: client),
       child: BlocListener<CreateTopicScreenBloc, CreateTopicScreenState>(
-        listenWhen: (prev,cur) => prev.status != cur.status,
+        listenWhen: (prev, cur) => prev.status != cur.status,
         listener: (context, state) {
-          if (state.status == CreateTopicScreenStatus.success){
+          if (state.status == CreateTopicScreenStatus.success) {
             Navigator.pop(context);
           }
         },
-        child: CreateTopicView(),
+        child: const CreateTopicView(),
       ),
     );
   }
@@ -41,43 +40,36 @@ class CreateTopicView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextField(
-                decoration: const InputDecoration(
-                  labelText: 'Title',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: 'Название топика',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15)),
                 ),
-                onChanged: (value) =>
-                {
-                  bloc.add(
-                    CreateTopicScreenTitleChanged(value),
-                  ),
+                onChanged: (value) {
+                  bloc.add(CreateTopicScreenTitleChanged(value));
                 },
               ),
               const SizedBox(
                 height: 8,
               ),
               TextField(
-                decoration: const InputDecoration(
-                  labelText: 'Description',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: 'Описание',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15)),
                 ),
-                onChanged: (value) =>
-                {
-                  bloc.add(
-                    CreateTopicScreenDescriptionChanged(value),
-                  )
+                onChanged: (value) {
+                  bloc.add(CreateTopicScreenDescriptionChanged(value));
                 },
               ),
               const SizedBox(
                 height: 8,
               ),
               ElevatedButton(
-                onPressed: () =>
-                {
-                  bloc.add(
-                    CreateTopicScreenCreate(),
-                  )
+                onPressed: () {
+                  bloc.add(CreateTopicScreenCreate());
                 },
-                child: const Text('Continue'),
+                child: const Text('Создать'),
               ),
             ],
           ),

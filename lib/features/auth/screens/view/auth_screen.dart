@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:surf_practice_chat_flutter/features/topics/screens/topics_screen/view/topics_screen.dart';
 import 'package:surf_study_jam/surf_study_jam.dart';
 
 import 'package:surf_practice_chat_flutter/features/auth/repository/auth_repository.dart';
 import 'package:surf_practice_chat_flutter/features/auth/screens/bloc/auth_screen_bloc.dart';
-import 'package:surf_practice_chat_flutter/features/chat/repository/chat_repository.dart';
-import 'package:surf_practice_chat_flutter/features/chat/screens/view/chat_screen.dart';
 
 /// Screen for authorization process.
 ///
@@ -68,35 +65,21 @@ class AuthScreen extends StatelessWidget {
   }
 
   void _pushToChat(BuildContext context, StudyJamClient client) async {
-    // final prefs = await SharedPreferences.getInstance();
-    // final String? savedToken = prefs.getString('token');
     Navigator.push(context, MaterialPageRoute(builder: (_) {
-      return TopicsPage(
-        client: client,
-      );
-      // Scaffold(appBar: AppBar());
-      // TopicsPage(client: client);
+      return TopicsPage(client: client);
     }));
   }
-
-  // void _pushToChat(BuildContext context, TokenDto token) {
-  //   Navigator.push<ChatScreen>(
-  //     context,
-  //     MaterialPageRoute(
-  //       builder: (_) {
-  //         return ChatScreen(
-  //           chatRepository: ChatRepository(
-  //             StudyJamClient().getAuthorizedClient(token.token),
-  //           ),
-  //         );
-  //       },
-  //     ),
-  //   );
-  // }
 }
 
-class AuthView extends StatelessWidget {
+class AuthView extends StatefulWidget {
   const AuthView({Key? key}) : super(key: key);
+
+  @override
+  State<AuthView> createState() => _AuthViewState();
+}
+
+class _AuthViewState extends State<AuthView> {
+  bool _passwordVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -130,10 +113,17 @@ class AuthView extends StatelessWidget {
             ),
             TextFormField(
               initialValue: initPassword,
-              obscureText: true,
+              obscureText: !_passwordVisible,
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.lock),
                 labelText: 'Пароль',
+                suffixIcon: IconButton(
+                    icon: Icon(_passwordVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off),
+                    onPressed: () => setState(() {
+                          _passwordVisible = !_passwordVisible;
+                        })),
                 border:
                     OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
