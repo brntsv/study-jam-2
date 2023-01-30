@@ -29,16 +29,3 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # assets:
-  #   - assets/images/
-
-  fonts:
-    - family: zelek
-      fonts:
-        - asset: assets/fonts/zelek.ttf
-    - family: play
-      fonts:
-        - asset: assets/fonts/play.ttf
-    - family: blender
-      fonts:
-        - asset: assets/fonts/BlenderPro.ttf

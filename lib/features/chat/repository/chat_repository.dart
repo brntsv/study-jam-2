@@ -3,7 +3,7 @@ import 'package:surf_study_jam/surf_study_jam.dart';
 import 'package:surf_practice_chat_flutter/features/chat/exceptions/invalid_message_exception.dart';
 import 'package:surf_practice_chat_flutter/features/chat/exceptions/user_not_found_exception.dart';
 import 'package:surf_practice_chat_flutter/features/chat/models/cha_multi_message_dto.dart';
-import 'package:surf_practice_chat_flutter/features/chat/models/chat_geolocation_geolocation_dto.dart';
+import 'package:surf_practice_chat_flutter/features/chat/models/chat_geolocation_dto.dart';
 import 'package:surf_practice_chat_flutter/features/chat/models/chat_message_dto.dart';
 import 'package:surf_practice_chat_flutter/features/chat/models/chat_message_location_dto.dart';
 import 'package:surf_practice_chat_flutter/features/chat/models/chat_user_dto.dart';
