@@ -5,7 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:surf_study_jam/surf_study_jam.dart';
 
 import 'package:surf_practice_chat_flutter/features/chat/models/cha_multi_message_dto.dart';
-import 'package:surf_practice_chat_flutter/features/chat/models/chat_geolocation_geolocation_dto.dart';
+import 'package:surf_practice_chat_flutter/features/chat/models/chat_geolocation_dto.dart';
 import 'package:surf_practice_chat_flutter/features/chat/repository/chat_repository.dart';
 
 part 'chat_screen_event.dart';

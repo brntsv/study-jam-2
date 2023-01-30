@@ -167,9 +167,6 @@ class _ChatTextField extends StatelessWidget {
                     state.stickers.isNotEmpty
                         ? Text('Stickers count: ${state.stickers.length}')
                         : Container(),
-                    // state.images != null
-                    //     ? Text('Images count: ${state.images!.length}')
-                    //     : Container(),
                   ],
                 );
               },
