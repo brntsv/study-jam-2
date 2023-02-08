@@ -53,10 +53,7 @@ class AuthScreen extends StatelessWidget {
         SnackBar(
           content: Row(
             children: const [
-              Icon(
-                Icons.error,
-                color: Colors.red,
-              ),
+              Icon(Icons.error, color: Colors.red),
               Text(' Error: invalid login or password'),
             ],
           ),

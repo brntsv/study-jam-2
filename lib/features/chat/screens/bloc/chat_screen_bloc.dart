@@ -25,9 +25,9 @@ class ChatScreenBloc extends Bloc<ChatScreenEvent, ChatScreenState> {
     on<ChatScreenUpdate>(_onUpdate);
     on<ChatScreenTextChanged>(_onTextChanged);
     on<ChatScreenSendMessage>(_onSendMessage);
-    on<ChatScreenShowStickers>(_onShowGallery);
-    on<ChatScreenHideStickers>(_onHideGallery);
-    on<ChatScreenChooseSticker>(_onChangeGallery);
+    on<ChatScreenShowStickers>(_onShowStickers);
+    on<ChatScreenHideStickers>(_onHideStickers);
+    on<ChatScreenChooseSticker>(_onChangeSticker);
     on<ChatScreenLoadGeo>(_onLoadGeo);
     on<ChatScreenLoadSticker>(_onLoadSticker);
     // on<ChatScreenSelectImages>(_onSelectImages);
@@ -70,17 +70,17 @@ class ChatScreenBloc extends Bloc<ChatScreenEvent, ChatScreenState> {
     add(ChatScreenUpdate());
   }
 
-  void _onShowGallery(
+  void _onShowStickers(
       ChatScreenShowStickers event, Emitter<ChatScreenState> emit) {
     emit(state.copyWith(isStickerKeyboard: true));
   }
 
-  void _onHideGallery(
+  void _onHideStickers(
       ChatScreenHideStickers event, Emitter<ChatScreenState> emit) {
     emit(state.copyWith(isStickerKeyboard: false));
   }
 
-  void _onChangeGallery(
+  void _onChangeSticker(
       ChatScreenChooseSticker event, Emitter<ChatScreenState> emit) {
     emit(state.copyWith(isStickerKeyboard: !state.isStickerKeyboard));
   }
